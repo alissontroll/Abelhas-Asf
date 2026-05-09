@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ASF Brasil">
+<meta name="theme-color" content="#92400e">
+<title>ASF Brasil 🐝</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mel: #d97706;
+    --mel-escuro: #92400e;
+    --mel-claro: #fcd34d;
+    --fundo: #1a0800;
+    --fundo2: #2d1200;
+    --texto: #fef3c7;
+    --texto2: #fcd34d;
+    --borda: rgba(146,64,14,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at top, #2d1200 0%, #1a0800 60%);
+    z-index: -1;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #3d1a00, #92400e);
+    padding: 18px 16px 12px;
+    text-align: center;
+    border-bottom: 2px solid var(--mel);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-emoji { font-size: 32px; }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--texto);
+    margin: 4px 0 2px;
+    letter-spacing: 2px;
+  }
+  .header p { font-size: 11px; color: var(--mel-claro); opacity: 0.8; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: #120500;
+    border-bottom: 1px solid var(--borda);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 10px 4px;
+    background: transparent;
+    color: var(--mel);
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn.ativo {
+    color: var(--texto);
+    background: rgba(146,64,14,0.25);
+    border-bottom: 2px solid var(--mel);
+  }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 16px; overflow-y: auto; }
+  .section { display: none; }
+  .section.ativo { display: block; }
+
+  /* CARDS */
+  .card {
+    background: rgba(146,64,14,0.15);
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .card-destaque {
+    background: rgba(146,64,14,0.2);
+    border: 1px solid var(--mel);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* INÍCIO */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .grid-card {
+    background: rgba(146,64,14,0.2);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--texto);
+    border: none;
+    font-family: 'Lato', sans-serif;
+    transition: transform 0.15s;
+  }
+  .grid-card:active { transform: scale(0.96); }
+  .grid-card .gc-icon { font-size: 28px; margin-bottom: 4px; }
+  .grid-card .gc-titulo { font-weight: 700; font-size: 13px; color: var(--mel-claro); }
+  .grid-card .gc-desc { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+
+  /* ESPÉCIES */
+  .bioma-titulo {
+    font-family: 'Playfair Display', serif;
+    color: var(--mel-claro);
+    font-size: 15px;
+    margin: 16px 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--borda);
+  }
+  .especie-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(146,64,14,0.15);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    color: var(--texto);
+    font-family: 'Lato', sans-serif;
+    transition: background 0.2s;
+  }
+  .especie-item:active { background: rgba(146,64,14,0.35); }
+  .especie-item .ei-emoji { font-size: 26px; min-width: 32px; }
+  .especie-item .ei-info { flex: 1; }
+  .especie-item .ei-nome { font-weight: 700; font-size: 14px; color: var(--mel-claro); }
+  .especie-item .ei-cientifico { font-size: 11px; font-style: italic; opacity: 0.65; }
+  .especie-item .ei-meta { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+  .especie-item .ei-arrow { font-size: 16px; opacity: 0.4; }
+
+  /* FICHA DA ESPÉCIE */
+  .ficha { display: none; }
+  .ficha.ativo { display: block; }
+  .ficha-header { text-align: center; margin-bottom: 16px; }
+  .ficha-emoji { font-size: 56px; }
+  .ficha-nome { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--mel-claro); margin: 8px 0 4px; }
+  .ficha-cientifico { font-style: italic; opacity: 0.65; font-size: 13px; }
+  .ficha-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(146,64,14,0.25);
+    padding: 9px 0;
+    font-size: 13px;
+    gap: 8px;
+  }
+  .ficha-label { color: var(--mel-claro); font-weight: 700; min-width: 130px; }
+  .ficha-valor { text-align: right; opacity: 0.9; }
+  .ficha-curiosidade {
+    margin-top: 14px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* BUSCA */
+  .busca-input {
+    width: 100%;
+    background: rgba(146,64,14,0.2);
+    border: 1px solid var(--mel-escuro);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--texto);
+    font-size: 14px;
+    margin-bottom: 14px;
+    outline: none;
+    font-family: 'Lato', sans-serif;
+  }
+  .busca-input::placeholder { color: rgba(254,243,199,0.4); }
+
+  /* IDENTIFICAR */
+  .foto-area {
+    background: rgba(146,64,14,0.15);
+    border: 2px dashed var(--mel);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: background 0.2s;
+  }
+  .foto-area:active { background: rgba(146,64,14,0.3); }
+  .foto-area img { max-width: 100%; max-height: 220px; border-radius: 10px; }
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--mel-escuro), var(--mel));
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--texto);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 14px;
+    font-family: 'Lato', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-voltar {
+    background: rgba(146,64,14,0.3);
+    border: 1px solid var(--mel-escuro);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--mel-claro);
+    cursor: pointer;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+  }
+  .resultado {
+    background: rgba(146,64,14,0.2);
+    border: 1px solid var(--mel);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .resultado-titulo { color: var(--mel-claro); font-weight: 700; margin-bottom: 8px; }
+
+  /* CHAT */
+  .chat-container { display: flex; flex-direction: column; height: calc(100vh - 220px); }
+  .chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding-right: 2px; }
+  .msg { max-width: 85%; padding: 10px 14px; font-size: 13px; line-height: 1.6; border-radius: 16px; }
+  .msg-bot { background: rgba(146,64,14,0.25); border: 1px solid var(--mel-escuro); border-radius: 16px 16px 16px 4px; align-self: flex-start; }
+  .msg-user { background: linear-gradient(135deg, var(--mel-escuro), var(--mel)); border-radius: 16px 16px 4px 16px; align-self: flex-end; }
+  .chat-input-area { display: flex; gap: 8px; }
+  .chat-input {
+    flex: 1;
+    background: rgba(146,64,14,0.2);
+    border: 1px solid var(--mel-escuro);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--texto);
+    font-size: 13px;
+    outline: none;
+    font-family: 'Lato', sans-serif;
+  }
+  .chat-input::placeholder { color: rgba(254,243,199,0.4); }
+  .chat-send {
+    background: linear-gradient(135deg, var(--mel-escuro), var(--mel));
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: var(--texto);
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* CONFIG */
+  .config-label { font-size: 13px; color: var(--mel-claro); margin-bottom: 6px; display: block; }
+  .config-input {
+    width: 100%;
+    background: rgba(146,64,14,0.2);
+    border: 1px solid var(--mel-escuro);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--texto);
+    font-size: 13px;
+    margin-bottom: 12px;
+    outline: none;
+    font-family: 'Lato', sans-serif;
+    font-family: monospace;
+  }
+  .config-info {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .tag-bioma {
+    display: inline-block;
+    background: rgba(146,64,14,0.4);
+    border: 1px solid var(--borda);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    margin: 2px;
+    cursor: pointer;
+    color: var(--mel-claro);
+    transition: background 0.2s;
+  }
+  .tag-bioma.ativo, .tag-bioma:active { background: var(--mel-escuro); }
+
+  strong { color: var(--mel-claro); }
+  .loading-dots::after { content: '...'; animation: dots 1.2s infinite; }
+  @keyframes dots { 0%,100%{content:'.'} 50%{content:'...'} 75%{content:'...'} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-emoji">🐝</div>
+  <h1>ASF Brasil</h1>
+  <p>Abelhas Sem Ferrão Nativas do Brasil</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn ativo" onclick="mudarTab('inicio')">🏠 Início</button>
+  <button class="tab-btn" onclick="mudarTab('especies')">📚 Espécies</button>
+  <button class="tab-btn" onclick="mudarTab('identificar')">📷 Identificar</button>
+  <button class="tab-btn" onclick="mudarTab('chat')">💬 Chat</button>
+  <button class="tab-btn" onclick="mudarTab('config')">⚙️ Config</button>
+</div>
+
+<div class="content">
+
+  <!-- INÍCIO -->
+  <div id="sec-inicio" class="section ativo">
+    <div class="card-destaque">
+      <div style="font-size:52px;margin-bottom:8px">🍯</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:18px;color:var(--mel-claro);margin-bottom:8px">Bem-vindo ao ASF Brasil</h2>
+      <p style="font-size:13px;line-height:1.6;opacity:0.9">Seu guia completo sobre as abelhas sem ferrão nativas do Brasil. Conheça espécies, identifique por foto com IA e tire dúvidas.</p>
+    </div>
+    <div class="grid-2">
+      <button class="grid-card" onclick="mudarTab('especies')" style="background:rgba(146,64,14,0.2);border:1px solid rgba(146,64,14,0.4)">
+        <div class="gc-icon">📚</div>
+        <div class="gc-titulo">Espécies</div>
+        <div class="gc-desc">40 espécies catalogadas</div>
+      </button>
+      <button class="grid-card" onclick="mudarTab('identificar')" style="background:rgba(146,64,14,0.2);border:1px solid rgba(146,64,14,0.4)">
+        <div class="gc-icon">📷</div>
+        <div class="gc-titulo">Identificar</div>
+        <div class="gc-desc">Foto → IA identifica</div>
+      </button>
+      <button class="grid-card" onclick="mudarTab('chat')" style="background:rgba(146,64,14,0.2);border:1px solid rgba(146,64,14,0.4)">
+        <div class="gc-icon">💬</div>
+        <div class="gc-titulo">Tirar dúvidas</div>
+        <div class="gc-desc">Chat com IA especialista</div>
+      </button>
+      <button class="grid-card" onclick="mudarTab('config')" style="background:rgba(146,64,14,0.2);border:1px solid rgba(146,64,14,0.4)">
+        <div class="gc-icon">⚙️</div>
+        <div class="gc-titulo">Configurar</div>
+        <div class="gc-desc">Chave da API</div>
+      </button>
+    </div>
+    <div class="card" style="text-align:center">
+      <p style="font-size:12px;color:var(--mel-claro)">🌎 O Brasil tem mais de <strong>300 espécies</strong> de abelhas sem ferrão — mais que qualquer outro país do mundo!</p>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <p style="font-size:12px;line-height:1.6;opacity:0.85">🗺️ <strong>5 biomas cobertos:</strong> Caatinga · Amazônia · Cerrado · Mata Atlântica · Pantanal & Sul</p>
+    </div>
+  </div>
+
+  <!-- ESPÉCIES -->
+  <div id="sec-especies" class="section">
+    <div id="lista-especies">
+      <input class="busca-input" id="busca" placeholder="🔍 Buscar espécie..." oninput="filtrarEspecies()" />
+      <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:4px">
+        <span class="tag-bioma ativo" onclick="filtrarBioma('todos',this)">Todos</span>
+        <span class="tag-bioma" onclick="filtrarBioma('Caatinga',this)">🌵 Caatinga</span>
+        <span class="tag-bioma" onclick="filtrarBioma('Amazônia',this)">🌳 Amazônia</span>
+        <span class="tag-bioma" onclick="filtrarBioma('Cerrado',this)">🌾 Cerrado</span>
+        <span class="tag-bioma" onclick="filtrarBioma('Mata Atlântica',this)">🌿 Mata Atlântica</span>
+        <span class="tag-bioma" onclick="filtrarBioma('Sul',this)">❄️ Sul</span>
+      </div>
+      <div id="lista-container"></div>
+    </div>
+    <div id="ficha-container" style="display:none">
+      <button class="btn-voltar" onclick="voltarLista()">← Voltar para lista</button>
+      <div id="ficha-conteudo"></div>
+    </div>
+  </div>
+
+  <!-- IDENTIFICAR -->
+  <div id="sec-identificar" class="section">
+    <h2 style="font-family:'Playfair Display',serif;color:var(--mel-claro);font-size:18px;margin-bottom:6px">📷 Identificar por Foto</h2>
+    <p style="font-size:13px;opacity:0.8;margin-bottom:14px">Tire uma foto da abelha e a IA vai identificar a espécie!</p>
+    <input type="file" id="foto-input" accept="image/*" capture="environment" style="display:none" onchange="previewFoto(event)">
+    <div class="foto-area" onclick="document.getElementById('foto-input').click()" id="foto-area">
+      <div style="font-size:40px;margin-bottom:8px">📸</div>
+      <div style="font-size:14px">Toque para tirar foto ou escolher da galeria</div>
+    </div>
+    <button class="btn-primary" id="btn-identificar" onclick="identificarAbelha()" disabled>🐝 Identificar Abelha</button>
+    <div id="resultado-id" style="display:none" class="resultado">
+      <div class="resultado-titulo">📋 Resultado da identificação:</div>
+      <div id="resultado-texto"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="sec-chat" class="section">
+    <h2 style="font-family:'Playfair Display',serif;color:var(--mel-claro);font-size:18px;margin-bottom:12px">💬 Especialista em ASF</h2>
+    <div class="chat-container">
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="msg msg-bot">🐝 Olá! Sou especialista em abelhas sem ferrão do Brasil. Pode me perguntar qualquer coisa sobre espécies, criação, mel ou manejo!</div>
+      </div>
+      <div class="chat-input-area">
+        <input class="chat-input" id="chat-input" placeholder="Pergunta sobre ASF..." onkeydown="if(event.key==='Enter')enviarChat()">
+        <button class="chat-send" onclick="enviarChat()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div id="sec-config" class="section">
+    <h2 style="font-family:'Playfair Display',serif;color:var(--mel-claro);font-size:18px;margin-bottom:14px">⚙️ Configurações</h2>
+    <div class="config-info">
+      <strong>Como obter sua chave de API:</strong><br>
+      1. Acesse <strong>console.anthropic.com</strong><br>
+      2. Crie uma conta gratuita<br>
+      3. Vá em "API Keys" e crie uma chave<br>
+      4. Cole aqui abaixo<br><br>
+      A chave é necessária para o <strong>Identificador</strong> e o <strong>Chat</strong> funcionarem quando o app estiver hospedado no Netlify.
+    </div>
+    <label class="config-label">🔑 Chave da API Anthropic:</label>
+    <input class="config-input" id="api-key-input" type="password" placeholder="sk-ant-..." oninput="salvarChave()">
+    <button class="btn-primary" onclick="salvarChave();alert('✅ Chave salva!')">Salvar Chave</button>
+    <div class="card" style="margin-top:8px">
+      <p style="font-size:12px;line-height:1.6;opacity:0.85">💡 A chave fica salva no seu navegador (localStorage). Nunca é enviada pra nenhum servidor além da API da Anthropic.</p>
+    </div>
+    <div class="card" style="margin-top:8px;text-align:center">
+      <p style="font-size:12px;color:var(--mel-claro);margin-bottom:4px"><strong>ASF Brasil v1.0</strong></p>
+      <p style="font-size:11px;opacity:0.7">40 espécies · IA Anthropic Claude · Feito com 🐝</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== DADOS =====================
+const ESPECIES = [
+  // CAATINGA
+  { nome:"Jataí", cien:"Tetragonisca angustula", bioma:"Caatinga", regiao:"Brasil todo", tam:"3–4 mm", mel:"0,5–1,5 L/ano", temp:"Dócil", cor:"Amarela e preta", hab:"Frestas em paredes, troncos, mourões", cur:"Sentinelas flutuam na entrada do ninho. Uma das mais populares do Brasil para meliponicultura.", emoji:"🌟" },
+  { nome:"Jati Amarela", cien:"Plebeia sp.", bioma:"Caatinga", regiao:"Nordeste e Centro-Oeste", tam:"2–3 mm", mel:"0,3–1 L/ano", temp:"Muito dócil", cor:"Amarelada", hab:"Troncos, fendas, caixas rústicas", cur:"Muito pequena, quase invisível em voo. Muito comum no agreste pernambucano.", emoji:"💛" },
+  { nome:"Uruçu Nordestina", cien:"Melipona scutellaris", bioma:"Caatinga", regiao:"Nordeste", tam:"10–12 mm", mel:"3–5 L/ano", temp:"Dócil", cor:"Preta com manchas amarelas", hab:"Troncos grandes de árvores nativas", cur:"Símbolo da meliponicultura nordestina. Muito valorizada na Bahia e Pernambuco. Abelha estadual da Bahia.", emoji:"🌵" },
+  { nome:"Canudo", cien:"Scaptotrigona tubiba", bioma:"Caatinga", regiao:"Brasil todo", tam:"5–6 mm", mel:"1–3 L/ano", temp:"Agressiva", cor:"Preta", hab:"Troncos, mourões, buracos no solo", cur:"Entrada do ninho em formato de tubo de cera. Morde e gruda no cabelo quando perturbada.", emoji:"🔫" },
+  { nome:"Mosquito", cien:"Plebeia mosquito", bioma:"Caatinga", regiao:"Nordeste", tam:"2 mm", mel:"0,2–0,5 L/ano", temp:"Dócil", cor:"Preta brilhante", hab:"Fendas pequenas em paredes e troncos", cur:"Uma das menores abelhas do Brasil. Faz ninhos em espaços minúsculos.", emoji:"🦟" },
+  { nome:"Sanharó", cien:"Frieseomelitta varia", bioma:"Caatinga", regiao:"Nordeste e Cerrado", tam:"4–5 mm", mel:"0,5–1 L/ano", temp:"Dócil", cor:"Amarela com listras", hab:"Troncos e galhos secos", cur:"Constrói ninhos com cera branca brilhante. Muito bonita visualmente.", emoji:"☀️" },
+  { nome:"Abelha Limão", cien:"Lestrimelitta limao", bioma:"Caatinga", regiao:"Brasil todo", tam:"5–6 mm", mel:"Não produz", temp:"Muito agressiva", cor:"Preta", hab:"Invade ninhos de outras abelhas", cur:"Não coleta néctar. Ataca colônias para roubar mel. Exala forte cheiro de limão durante o ataque.", emoji:"⚠️" },
+  { nome:"Tujuba", cien:"Melipona asilvai", bioma:"Caatinga", regiao:"Nordeste", tam:"9–11 mm", mel:"2–4 L/ano", temp:"Dócil", cor:"Amarela com manchas pretas", hab:"Troncos de árvores da caatinga", cur:"Endêmica da caatinga nordestina. Pouco conhecida fora da região.", emoji:"🟡" },
+  // AMAZÔNIA
+  { nome:"Uruçu Flavolineata", cien:"Melipona flavolineata", bioma:"Amazônia", regiao:"Norte e Nordeste", tam:"10–12 mm", mel:"2–6 L/ano", temp:"Dócil", cor:"Preta com listras amarelas finas", hab:"Troncos grandes na Amazônia", cur:"Mel considerado um dos mais medicinais do Brasil. Muito valorizado no Pará.", emoji:"✨" },
+  { nome:"Uruçu Amarela", cien:"Melipona flavolineata var.", bioma:"Amazônia", regiao:"Amazônia", tam:"10–12 mm", mel:"2–5 L/ano", temp:"Dócil", cor:"Amarela com manchas escuras", hab:"Troncos grandes na floresta amazônica", cur:"Variedade da uruçu muito apreciada pelos povos indígenas amazônicos.", emoji:"🌕" },
+  { nome:"Inhaí", cien:"Trigona fulviventris", bioma:"Amazônia", regiao:"Norte do Brasil", tam:"6–7 mm", mel:"1–2 L/ano", temp:"Agressiva", cor:"Preta com abdômen alaranjado", hab:"Troncos de árvores grandes", cur:"Defende o ninho com resina grudenta nos intrusos.", emoji:"🟠" },
+  { nome:"Arapuá", cien:"Trigona spinipes", bioma:"Amazônia", regiao:"Brasil todo", tam:"5–6 mm", mel:"0,5–1 L/ano", temp:"Muito agressiva", cor:"Preta", hab:"Troncos, galhos, estruturas abertas", cur:"Constrói ninhos externos expostos. Muito comum em ambientes urbanos e rurais.", emoji:"🏚️" },
+  { nome:"Tupuna", cien:"Melipona interrupta", bioma:"Amazônia", regiao:"Amazônia Ocidental", tam:"9–11 mm", mel:"2–4 L/ano", temp:"Dócil", cor:"Preta com listras amarelas", hab:"Troncos na floresta amazônica densa", cur:"Importante para povos indígenas do Amazonas e Pará.", emoji:"🌿" },
+  { nome:"Tiúba", cien:"Melipona compressipes", bioma:"Amazônia", regiao:"Nordeste e Norte", tam:"9–11 mm", mel:"3–5 L/ano", temp:"Dócil", cor:"Preta com listras amarelas", hab:"Troncos de árvores grandes", cur:"Abelha oficial do Maranhão. Muito importante para a meliponicultura do Nordeste.", emoji:"🏆" },
+  { nome:"Mombuca", cien:"Melipona seminigra", bioma:"Amazônia", regiao:"Amazônia", tam:"10–12 mm", mel:"2–4 L/ano", temp:"Dócil", cor:"Preta quase toda", hab:"Troncos grandes da floresta", cur:"Uma das Meliponas mais escuras. Produz mel com sabor único e levemente ácido.", emoji:"⬛" },
+  { nome:"Maçaranduba", cien:"Schwarziana quadripunctata", bioma:"Amazônia", regiao:"Norte e Sudeste", tam:"3–4 mm", mel:"0,3–0,8 L/ano", temp:"Dócil", cor:"Preta com pontos amarelos", hab:"Troncos e bromélias", cur:"Faz ninhos em locais inusitados como bromélias. Rainha muito maior que as operárias.", emoji:"🍫" },
+  // CERRADO
+  { nome:"Mandaçaia", cien:"Melipona quadrifasciata", bioma:"Cerrado", regiao:"Sudeste e Sul", tam:"10–12 mm", mel:"3–6 L/ano", temp:"Dócil", cor:"Preta com 4 listras amarelas", hab:"Troncos de árvores nativas do cerrado", cur:"Uma das maiores produtoras de mel entre as ASF. Muito fácil de identificar pelas 4 listras.", emoji:"🍯" },
+  { nome:"Manduri", cien:"Melipona marginata", bioma:"Cerrado", regiao:"Sul e Sudeste", tam:"6–8 mm", mel:"1–2 L/ano", temp:"Dócil", cor:"Preta com bordas amarelas", hab:"Troncos de árvores nativas", cur:"Menor que a mandaçaia, mas mel igualmente apreciado. Comum no interior de São Paulo.", emoji:"🌼" },
+  { nome:"Iraí", cien:"Nannotrigona testaceicornis", bioma:"Cerrado", regiao:"Brasil todo", tam:"4–5 mm", mel:"0,5–1 L/ano", temp:"Dócil", cor:"Amarelo-alaranjada", hab:"Troncos, frestas em construções", cur:"Muito comum em áreas urbanas e rurais. Fácil de criar em caixas racionais.", emoji:"🧡" },
+  { nome:"Borá", cien:"Tetragona clavipes", bioma:"Cerrado", regiao:"Centro-Oeste e Sudeste", tam:"5–6 mm", mel:"0,5–1 L/ano", temp:"Agressiva", cor:"Preta com abdômen listrado", hab:"Troncos de aroeira, angico e outras nativas", cur:"Constrói ninhos com entrada em forma de funil. Muito territorial.", emoji:"🌀" },
+  { nome:"Caga-fogo", cien:"Oxytrigona tataira", bioma:"Cerrado", regiao:"Brasil todo", tam:"4–5 mm", mel:"Pouca produção", temp:"Muito agressiva", cor:"Preta e laranja", hab:"Troncos e galhos secos", cur:"Defende o ninho com secreção cáustica que queima a pele. Nunca manejar sem proteção!", emoji:"🔥" },
+  { nome:"Mirim Guaçu", cien:"Plebeia remota", bioma:"Cerrado", regiao:"Sul e Sudeste", tam:"2–3 mm", mel:"0,2–0,5 L/ano", temp:"Dócil", cor:"Preta brilhante", hab:"Troncos finos e galhos", cur:"Uma das menores abelhas do Brasil. Construção do ninho muito organizada.", emoji:"🔬" },
+  { nome:"Guiruçu", cien:"Schwarziana mourei", bioma:"Cerrado", regiao:"Cerrado central", tam:"3–4 mm", mel:"0,3–0,7 L/ano", temp:"Dócil", cor:"Preta com reflexos dourados", hab:"Troncos de cerrado e galhos grossos", cur:"Rainha physogástrica muito volumosa comparada às operárias.", emoji:"💎" },
+  // MATA ATLÂNTICA
+  { nome:"Jataí da Mata", cien:"Tetragonisca weyrauchi", bioma:"Mata Atlântica", regiao:"Sul e Sudeste", tam:"3–4 mm", mel:"0,5–1 L/ano", temp:"Dócil", cor:"Amarela e preta", hab:"Troncos na mata atlântica densa", cur:"Parente da Jataí, mas exclusiva da Mata Atlântica. Mel muito saboroso.", emoji:"🌳" },
+  { nome:"Mirim Droryana", cien:"Plebeia droryana", bioma:"Mata Atlântica", regiao:"Sudeste e Sul", tam:"2–3 mm", mel:"0,2–0,5 L/ano", temp:"Muito dócil", cor:"Preta brilhante", hab:"Frestas em paredes, troncos finos", cur:"Praticamente invisível em voo. Construção do ninho muito delicada.", emoji:"🔬" },
+  { nome:"Moça Branca", cien:"Frieseomelitta silvestrii", bioma:"Mata Atlântica", regiao:"Sudeste", tam:"4–5 mm", mel:"0,3–0,8 L/ano", temp:"Dócil", cor:"Branca e preta", hab:"Troncos na mata fechada", cur:"Uma das mais bonitas das ASF. Operárias com coloração clara incomum.", emoji:"🤍" },
+  { nome:"Tubuna", cien:"Scaptotrigona bipunctata", bioma:"Mata Atlântica", regiao:"Sul e Sudeste", tam:"5–6 mm", mel:"1–2 L/ano", temp:"Agressiva", cor:"Preta", hab:"Troncos na mata atlântica", cur:"Similar à canudo. Ataca o cabelo quando perturbada. Mel bastante apreciado no Sul.", emoji:"🌑" },
+  { nome:"Bugia", cien:"Melipona bicolor", bioma:"Mata Atlântica", regiao:"Sul e Sudeste", tam:"9–11 mm", mel:"2–4 L/ano", temp:"Dócil", cor:"Preta com listras amarelas e brancas", hab:"Troncos na mata atlântica", cur:"Única Melipona com duas rainhas funcionais convivendo na mesma colônia.", emoji:"👑" },
+  { nome:"Guaraipo", cien:"Melipona bicolor schencki", bioma:"Mata Atlântica", regiao:"Sul do Brasil", tam:"9–11 mm", mel:"2–4 L/ano", temp:"Dócil", cor:"Preta com manchas amarelas e brancas", hab:"Troncos grandes na mata sul", cur:"Muito apreciada no Paraná e Santa Catarina. Mel com sabor levemente frutado.", emoji:"🍑" },
+  { nome:"Abelha Arapuá", cien:"Trigona spinipes", bioma:"Mata Atlântica", regiao:"Brasil todo", tam:"5–6 mm", mel:"0,3–0,7 L/ano", temp:"Agressiva", cor:"Preta", hab:"Construções abertas, galhos, beirais", cur:"Constrói ninhos externos sem proteção. Invade pomares para coletar frutos.", emoji:"🏗️" },
+  { nome:"Mirim Preguiça", cien:"Leurotrigona muelleri", bioma:"Mata Atlântica", regiao:"Sudeste", tam:"2 mm", mel:"0,1–0,3 L/ano", temp:"Muito dócil", cor:"Preta com cabeça grande", hab:"Galhos e troncos finos", cur:"Cabeça proporcionalmente enorme. Voo muito lento e desajeitado, daí o nome.", emoji:"🐌" },
+  // PANTANAL E SUL
+  { nome:"Mandaçaia do Sul", cien:"Melipona quadrifasciata anthidioides", bioma:"Sul", regiao:"Sul do Brasil", tam:"10–12 mm", mel:"3–5 L/ano", temp:"Dócil", cor:"Preta com 4 listras amarelas largas", hab:"Troncos de araucárias e outras árvores", cur:"Subespécie da mandaçaia adaptada ao sul frio do Brasil. Colônias muito resistentes ao inverno.", emoji:"❄️" },
+  { nome:"Tubiba", cien:"Scaptotrigona tubiba", bioma:"Sul", regiao:"Sul e Sudeste", tam:"5–6 mm", mel:"1–2 L/ano", temp:"Agressiva", cor:"Preta", hab:"Troncos na mata sul", cur:"Versão sulista da canudo. Produz mel com sabor bastante forte e característico.", emoji:"🌲" },
+  { nome:"Mosquito do Sul", cien:"Plebeia emerina", bioma:"Sul", regiao:"Sul do Brasil", tam:"2–3 mm", mel:"0,2–0,5 L/ano", temp:"Dócil", cor:"Preta", hab:"Troncos de araucárias e pinheiros", cur:"Adaptada ao frio do sul. Uma das poucas ASF que sobrevive em regiões com geadas.", emoji:"🌨️" },
+  { nome:"Irapuá", cien:"Trigona spinipes", bioma:"Sul", regiao:"Brasil todo", tam:"5–6 mm", mel:"0,3–0,8 L/ano", temp:"Agressiva", cor:"Preta com listras", hab:"Qualquer estrutura aberta", cur:"Extremamente oportunista. Constrói ninhos em caixas de correio, relógios externos, beirais.", emoji:"🏠" },
+  { nome:"Abelha Cachorro", cien:"Trigona hyalinata", bioma:"Sul", regiao:"Sul e Sudeste", tam:"6–7 mm", mel:"0,5–1 L/ano", temp:"Muito agressiva", cor:"Preta", hab:"Troncos e galhos grossos", cur:"Considerada a mais agressiva das ASF brasileiras. Ataca em grande número.", emoji:"🐕" },
+  { nome:"Munduri", cien:"Melipona asilvai", bioma:"Sul", regiao:"Nordeste e Sul", tam:"8–10 mm", mel:"1,5–3 L/ano", temp:"Dócil", cor:"Preta com manchas amarelas", hab:"Troncos de árvores nativas", cur:"Encontrada em populações isoladas no sul e nordeste. Mel muito apreciado localmente.", emoji:"🌸" },
+  { nome:"Abelha Mirim", cien:"Trigonisca pediculana", bioma:"Sul", regiao:"Sul e Sudeste", tam:"1,5–2 mm", mel:"0,1–0,2 L/ano", temp:"Muito dócil", cor:"Preta minúscula", hab:"Galhos, muros, troncos finos", cur:"Uma das menores abelhas do mundo. Quase microscópica. Raramente vista a olho nu.", emoji:"🔭" },
+  { nome:"Lambe-olhos", cien:"Leurotrigona pusilla", bioma:"Sul", regiao:"Sudeste e Sul", tam:"2 mm", mel:"0,1–0,2 L/ano", temp:"Dócil mas intrometida", cor:"Preta com cabeça grande", hab:"Troncos finos na mata", cur:"Muito atraída pelo suor humano e secreções oculares. Não morde, mas é bem chata nos olhos!", emoji:"👁️" },
+  { nome:"Abelha Asa de Vidro", cien:"Frieseomelitta languida", bioma:"Sul", regiao:"Sul e Sudeste", tam:"4–5 mm", mel:"0,3–0,8 L/ano", temp:"Dócil", cor:"Preta com asas transparentes brilhantes", hab:"Troncos na mata nativa", cur:"Asas com reflexo iridescente muito bonito. Ninho construído com cera quase branca.", emoji:"💎" },
+  { nome:"Cupira", cien:"Partamona helleri", bioma:"Sul", regiao:"Sul e Sudeste", tam:"5–6 mm", mel:"0,5–1 L/ano", temp:"Dócil", cor:"Preta com manchas alaranjadas", hab:"Cupinzeiros ativos e abandonados", cur:"Faz ninhos dentro de cupinzeiros! Convive com os cupins de forma pacífica.", emoji:"🏔️" },
+  { nome:"Jataí da Serra", cien:"Tetragonisca fiebrigi", bioma:"Sul", regiao:"Sul do Brasil", tam:"3–4 mm", mel:"0,4–1 L/ano", temp:"Dócil", cor:"Amarela e preta", hab:"Troncos na mata de araucária", cur:"Parente da Jataí comum, adaptada à altitude da Serra Gaúcha e catarinense.", emoji:"⛰️" },
+];
+
+let biomaAtivo = 'todos';
+let especieFiltrada = null;
+let chatHistory = [];
+let imagemBase64 = null;
+
+function getApiKey() {
+  return localStorage.getItem('asf_api_key') || '';
+}
+
+function salvarChave() {
+  const key = document.getElementById('api-key-input').value.trim();
+  localStorage.setItem('asf_api_key', key);
+}
+
+// Carregar chave salva
+window.onload = function() {
+  const saved = localStorage.getItem('asf_api_key');
+  if (saved) document.getElementById('api-key-input').value = saved;
+  renderLista();
+};
+
+function mudarTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('ativo'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
+  document.getElementById('sec-' + tab).classList.add('ativo');
+  const tabs = ['inicio','especies','identificar','chat','config'];
+  document.querySelectorAll('.tab-btn')[tabs.indexOf(tab)].classList.add('ativo');
+}
+
+function renderLista(filtro = '') {
+  const container = document.getElementById('lista-container');
+  let lista = ESPECIES;
+  if (biomaAtivo !== 'todos') lista = lista.filter(e => e.bioma === biomaAtivo);
+  if (filtro) lista = lista.filter(e =>
+    e.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+    e.cien.toLowerCase().includes(filtro.toLowerCase())
+  );
+  if (lista.length === 0) {
+    container.innerHTML = '<div class="card" style="text-align:center;opacity:0.7">Nenhuma espécie encontrada 🔍</div>';
+    return;
+  }
+  const biomas = [...new Set(lista.map(e => e.bioma))];
+  let html = '';
+  biomas.forEach(bioma => {
+    const especies = lista.filter(e => e.bioma === bioma);
+    const icones = {'Caatinga':'🌵','Amazônia':'🌳','Cerrado':'🌾','Mata Atlântica':'🌿','Sul':'❄️'};
+    html += `<div class="bioma-titulo">${icones[bioma]||'🐝'} ${bioma}</div>`;
+    especies.forEach(e => {
+      html += `<button class="especie-item" onclick="abrirFicha('${e.nome}')">
+        <span class="ei-emoji">${e.emoji}</span>
+        <div class="ei-info">
+          <div class="ei-nome">${e.nome}</div>
+          <div class="ei-cientifico">${e.cien}</div>
+          <div class="ei-meta">📍 ${e.regiao} · 🍯 ${e.mel}</div>
+        </div>
+        <span class="ei-arrow">›</span>
+      </button>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function filtrarEspecies() {
+  renderLista(document.getElementById('busca').value);
+}
+
+function filtrarBioma(bioma, el) {
+  biomaAtivo = bioma;
+  document.querySelectorAll('.tag-bioma').forEach(t => t.classList.remove('ativo'));
+  el.classList.add('ativo');
+  renderLista(document.getElementById('busca').value);
+}
+
+function abrirFicha(nome) {
+  const e = ESPECIES.find(x => x.nome === nome);
+  if (!e) return;
+  document.getElementById('lista-especies').style.display = 'none';
+  document.getElementById('ficha-container').style.display = 'block';
+  document.getElementById('ficha-conteudo').innerHTML = `
+    <div class="card" style="border:1px solid rgba(217,119,6,0.4)">
+      <div class="ficha-header">
+        <div class="ficha-emoji">${e.emoji}</div>
+        <div class="ficha-nome">${e.nome}</div>
+        <div class="ficha-cientifico">${e.cien}</div>
+      </div>
+      <div class="ficha-row"><span class="ficha-label">🗺️ Bioma</span><span class="ficha-valor">${e.bioma}</span></div>
+      <div class="ficha-row"><span class="ficha-label">📍 Região</span><span class="ficha-valor">${e.regiao}</span></div>
+      <div class="ficha-row"><span class="ficha-label">📏 Tamanho</span><span class="ficha-valor">${e.tam}</span></div>
+      <div class="ficha-row"><span class="ficha-label">🍯 Produção de mel</span><span class="ficha-valor">${e.mel}</span></div>
+      <div class="ficha-row"><span class="ficha-label">😊 Temperamento</span><span class="ficha-valor">${e.temp}</span></div>
+      <div class="ficha-row"><span class="ficha-label">🎨 Coloração</span><span class="ficha-valor">${e.cor}</span></div>
+      <div class="ficha-row"><span class="ficha-label">🏠 Habitat</span><span class="ficha-valor">${e.hab}</span></div>
+      <div class="ficha-curiosidade">💡 ${e.cur}</div>
+    </div>
+  `;
+}
+
+function voltarLista() {
+  document.getElementById('lista-especies').style.display = 'block';
+  document.getElementById('ficha-container').style.display = 'none';
+}
+
+// IDENTIFICAR
+function previewFoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    imagemBase64 = ev.target.result.split(',')[1];
+    document.getElementById('foto-area').innerHTML = `<img src="${ev.target.result}" alt="preview">`;
+    document.getElementById('btn-identificar').disabled = false;
+    document.getElementById('resultado-id').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function identificarAbelha() {
+  const apiKey = getApiKey();
+  if (!apiKey) { alert('⚙️ Configure sua chave de API primeiro na aba Config!'); return; }
+  if (!imagemBase64) return;
+  const btn = document.getElementById('btn-identificar');
+  btn.disabled = true;
+  btn.textContent = '🔍 Identificando...';
+  document.getElementById('resultado-id').style.display = 'none';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imagemBase64 } },
+            { type: 'text', text: `Você é especialista em meliponicultura brasileira. Analise esta imagem e identifique se é uma abelha sem ferrão do Brasil.\n\nResponda em português simples com:\n1. **Nome popular** da espécie\n2. **Nome científico**\n3. **Confiança** da identificação (alta/média/baixa)\n4. **Características visuais** que levaram à identificação\n5. **Curiosidade** interessante\n6. **Região** onde é encontrada\n\nSe não for uma abelha sem ferrão, diga o que é. Se a imagem não for boa, peça uma foto melhor.` }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    const texto = data.content?.map(i => i.text || '').join('') || 'Não consegui identificar.';
+    document.getElementById('resultado-texto').innerHTML = formatarTexto(texto);
+    document.getElementById('resultado-id').style.display = 'block';
+  } catch(e) {
+    document.getElementById('resultado-texto').innerHTML = 'Erro ao identificar. Verifique sua chave de API.';
+    document.getElementById('resultado-id').style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = '🐝 Identificar Abelha';
+}
+
+// CHAT
+async function enviarChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const apiKey = getApiKey();
+  if (!apiKey) { alert('⚙️ Configure sua chave de API primeiro na aba Config!'); return; }
+  input.value = '';
+  adicionarMensagem('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+  const loading = adicionarMensagem('bot', '<span class="loading-dots">Pensando</span>');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'Você é um especialista em abelhas sem ferrão (meliponíneas) do Brasil. Responda sempre em português simples, de forma amigável e didática. Foque em informações práticas sobre criação, manejo, mel, espécies brasileiras e meliponicultura. Se perguntarem sobre algo fora do tema, redirecione gentilmente para o assunto de abelhas.',
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const texto = data.content?.map(i => i.text || '').join('') || 'Não consegui responder.';
+    chatHistory.push({ role: 'assistant', content: texto });
+    loading.innerHTML = '🐝 ' + formatarTexto(texto);
+  } catch(e) {
+    loading.innerHTML = '🐝 Erro ao responder. Verifique sua chave de API.';
+  }
+}
+
+function adicionarMensagem(tipo, texto) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = `msg msg-${tipo}`;
+  div.innerHTML = tipo === 'bot' ? '🐝 ' + texto : texto;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function formatarTexto(texto) {
+  return texto
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+</script>
+</body>
+</html>
