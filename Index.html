@@ -363,16 +363,14 @@ async function enviarChat() {
   const loadDiv = adicionarMsg('bot', '<span class="loading">🐝 Pensando...</span>');
   try {
     const data = await chamarAPI({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
       system: 'Você é especialista em abelhas sem ferrão (meliponíneas) do Brasil. Responda sempre em português simples, amigável e didático. Foque em criação, manejo, mel, espécies brasileiras e meliponicultura.',
       messages: chatHistory
     });
-    const texto = data.content?.map(i => i.text || '').join('') || 'Não consegui responder.';
+    const texto = data.content?.map(i => i.text || '').join('') || 'Sem resposta.';
     chatHistory.push({ role: 'assistant', content: texto });
     loadDiv.innerHTML = '🐝 ' + formatarTexto(texto);
   } catch(e) {
-    loadDiv.innerHTML = '🐝 Erro ao responder. Tente novamente.';
+    loadDiv.innerHTML = '🐝 Erro: ' + e.message;
   }
 }
 
