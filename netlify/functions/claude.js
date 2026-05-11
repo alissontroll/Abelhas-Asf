@@ -16,7 +16,7 @@ exports.handler = async function(event) {
 
   const API_KEY = process.env.GEMINI_API_KEY;
   if (!API_KEY) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'GEMINI_API_KEY não encontrada' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ content: [{ type: 'text', text: 'GEMINI_API_KEY não encontrada' }] }) };
   }
 
   try {
@@ -45,23 +45,17 @@ exports.handler = async function(event) {
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${API_KEY}`,
       { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(geminiBody) }
     );
 
     const data = await response.json();
 
-    // Mostrar erro do Gemini se houver
     if (data.error) {
       return { statusCode: 200, headers, body: JSON.stringify({ content: [{ type: 'text', text: 'Erro Gemini: ' + data.error.message }] }) };
     }
 
-    // Tentar pegar o texto de diferentes formas
-    const texto = 
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') ||
-      'Resposta vazia do Gemini: ' + JSON.stringify(data).substring(0, 200);
-
+    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
     return { statusCode: 200, headers, body: JSON.stringify({ content: [{ type: 'text', text: texto }] }) };
 
   } catch (err) {
