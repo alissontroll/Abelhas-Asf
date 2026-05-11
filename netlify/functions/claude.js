@@ -32,21 +32,10 @@ exports.handler = async function(event) {
       } else if (Array.isArray(msg.content)) {
         const parts = [];
         for (const part of msg.content) {
-          if (part.type === 'text') {
-            parts.push({ text: part.text });
-          } else if (part.type === 'image') {
-            parts.push({
-              inlineData: {
-                mimeType: part.source.media_type,
-                data: part.source.data
-              }
-            });
-          }
+          if (part.type === 'text') parts.push({ text: part.text });
+          else if (part.type === 'image') parts.push({ inlineData: { mimeType: part.source.media_type, data: part.source.data } });
         }
-        contents.push({
-          role: msg.role === 'assistant' ? 'model' : 'user',
-          parts
-        });
+        contents.push({ role: msg.role === 'assistant' ? 'model' : 'user', parts });
       }
     }
 
@@ -57,23 +46,25 @@ exports.handler = async function(event) {
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(geminiBody)
-      }
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(geminiBody) }
     );
 
     const data = await response.json();
 
+    // Mostrar erro do Gemini se houver
     if (data.error) {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Gemini erro: ' + data.error.message }) };
+      return { statusCode: 200, headers, body: JSON.stringify({ content: [{ type: 'text', text: 'Erro Gemini: ' + data.error.message }] }) };
     }
 
-    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
+    // Tentar pegar o texto de diferentes formas
+    const texto = 
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') ||
+      'Resposta vazia do Gemini: ' + JSON.stringify(data).substring(0, 200);
+
     return { statusCode: 200, headers, body: JSON.stringify({ content: [{ type: 'text', text: texto }] }) };
 
   } catch (err) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erro interno: ' + err.message }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ content: [{ type: 'text', text: 'Erro interno: ' + err.message }] }) };
   }
 };
