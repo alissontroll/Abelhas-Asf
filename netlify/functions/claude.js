@@ -16,16 +16,13 @@ exports.handler = async function(event) {
 
   const API_KEY = process.env.GEMINI_API_KEY;
   if (!API_KEY) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'API key não configurada' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'GEMINI_API_KEY não encontrada' }) };
   }
 
   try {
     const body = JSON.parse(event.body);
-
-    // Montar mensagens no formato Gemini
     const contents = [];
 
-    // Adicionar histórico de mensagens
     for (const msg of body.messages) {
       if (typeof msg.content === 'string') {
         contents.push({
@@ -53,19 +50,9 @@ exports.handler = async function(event) {
       }
     }
 
-    const geminiBody = {
-      contents,
-      generationConfig: {
-        maxOutputTokens: 1000,
-        temperature: 0.7
-      }
-    };
-
-    // Adicionar system instruction se existir
+    const geminiBody = { contents, generationConfig: { maxOutputTokens: 1000 } };
     if (body.system) {
-      geminiBody.systemInstruction = {
-        parts: [{ text: body.system }]
-      };
+      geminiBody.systemInstruction = { parts: [{ text: body.system }] };
     }
 
     const response = await fetch(
@@ -79,14 +66,14 @@ exports.handler = async function(event) {
 
     const data = await response.json();
 
-    // Converter resposta do Gemini para formato compatível com o front-end
-    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Não consegui responder.';
-    const resposta = {
-      content: [{ type: 'text', text: texto }]
-    };
+    if (data.error) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Gemini erro: ' + data.error.message }) };
+    }
 
-    return { statusCode: 200, headers, body: JSON.stringify(resposta) };
+    const texto = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.';
+    return { statusCode: 200, headers, body: JSON.stringify({ content: [{ type: 'text', text: texto }] }) };
+
   } catch (err) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erro interno: ' + err.message }) };
   }
 };
